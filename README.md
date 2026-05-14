@@ -18,7 +18,7 @@ The project aims to create the feeling of “a user trying to build order while 
 <img src="assets/readme/ksmyyi.jpg" width="500">
 
 >Yayoi Kusama, Obliteration Room
-<img src="assets/readme/ksmyyi2.jpg" width="600">
+<img src="assets/readme/ksmyyi2.png" width="600">
 
 >Pony Island
 <img src="assets/readme/pony_island.jpg" width="600">
