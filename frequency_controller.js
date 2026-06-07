@@ -4,15 +4,15 @@ const glitchChars = ['#', '@', '%', '&', '/', '\\', '*', '?', '!', '░', '▓',
 function glitchComponent(component) {
 
   // bass
-  let bass = map(smoothBass, 125, 255, 0, 1);
+  let bass = constrain(map(smoothBass, 125, 255, 0, 1), 0, 1);
   let dongcidaci = bass * bass * bass * bass;
-  let shake = dongcidaci * 10 * corruption;
-  let x_offset = random(-shake, shake);
-  let y_offset = random(-shake, shake);
+  let bassShake = dongcidaci * 10 * corruption;
+  let bass_x_offset = random(-bassShake, bassShake);
+  let bass_y_offset = random(-bassShake, bassShake);
 
   // shaking effect
-  let x = component.x + x_offset;   
-  let y = component.y + y_offset;
+  let x = component.x + bass_x_offset;   
+  let y = component.y + bass_y_offset;
 
 
   // testing component
@@ -23,10 +23,34 @@ function glitchComponent(component) {
   rect(x, y, component.w, component.h);
   pop();
 
-  // mid
-  let mid = map(smoothMid, 75, 255, 0, 0.4);
+
+  // treble (frame)
+  let treble = constrain(map(smoothTreble, 0, 255, 0, 6), 0, 6);
+  let woxiale = treble * treble;
+
+  let treble_offset = woxiale * corruption;
 
   push();
+  rectMode(CORNER);
+  blendMode(ADD); //effect point
+
+  // red (left)
+  noStroke();
+  fill(120, 0, 0);
+  rect(x - treble_offset, y, component.w, component.h);
+  // green (middle)
+  fill(0, 120, 0);
+  rect(x, y, component.w, component.h);
+  // blue (right)
+  fill(0, 0, 120);
+  rect(x + treble_offset, y, component.w, component.h);
+
+  pop();
+
+  // mid and treble (text)
+  let mid = constrain(map(smoothMid, 75, 255, 0, 0.4), 0, 0.4);
+
+  // push();
   textAlign(LEFT, CENTER);
   textSize(20);
   noStroke();
@@ -40,14 +64,48 @@ function glitchComponent(component) {
   let charX = startX;    
 
   for (let letter of component.text) {
+    let displayChar;
+    if (random() < glitchLevel) {     // decide glitch or not
+      displayChar = random(glitchChars);
+    } else {
+      displayChar = letter;
+    }
+
+    let isRed = random() < redLevel;
+  
+    let text_offset = treble * 0.5 * corruption;
+  
+    push();
+    // red (left)
+    fill(isRed ? 255 : 180, 0, 0, 160);
+    text(displayChar, charX - text_offset, y + component.h / 2);
+  
+    // blue (right)
+    fill(0, 60, 220, 160);
+    text(displayChar, charX + text_offset, y + component.h / 2);
+  
+    // original text (middle)
+    if (isRed) {
+      fill(220, 40, 40);
+    } else {
+      fill(210, 210, 225);
+    }
+    text(displayChar, charX, y + component.h / 2);
+    pop();
+  
+    charX += textWidth(displayChar);
+  }
+
+  /*
+    for (let letter of component.text) {
     let displayText = "";
-    if (random() < glitchLevel) {
+    if (random() < glitchLevel) {     // decide glitch or not
       displayText += random(glitchChars);
     } else {
       displayText = letter;
     }
 
-    if (random() < redLevel) {
+    if (random() < redLevel) {      // decide red or not
       fill(220, 40, 40);
     } else {
       fill(210, 210, 225);
@@ -61,8 +119,9 @@ function glitchComponent(component) {
 
   pop();
 
+
   
-  // treble
-  let treble = map(smoothTreble, 0, 255, 0, 1);
-  let xiajibashan = treble * treble;
+  */
+
+  //现在我感觉需要做一个list，存放不同歌曲不一样的参数，我觉得具体会修改的参数一个是
 }
