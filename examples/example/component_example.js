@@ -4,22 +4,26 @@ let workspaceSegments;
 let missionSegments;
 let bgmSegments;
 
+let paletteComponents = [];
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   createInterfaceSegments();
+  createPaletteComponents();
 }
 
 function draw() {
   background(245);
 
   drawInterface();
+  drawPaletteComponents();
 }
 
 function createInterfaceSegments() {
   let roughnessLarge = 0.8;
   let roughnessSmall = 1.2;
 
-  outerSegments = createSegmentRect(
+  outerSegments = createSketchRect(
     width * 0.02,
     height * 0.03,
     width * 0.96,
@@ -28,7 +32,7 @@ function createInterfaceSegments() {
     roughnessLarge
   );
 
-  panelSegments = createSegmentRect(
+  panelSegments = createSketchRect(
     width * 0.035,
     height * 0.055,
     width * 0.16,
@@ -37,7 +41,7 @@ function createInterfaceSegments() {
     roughnessSmall
   );
 
-  workspaceSegments = createSegmentRect(
+  workspaceSegments = createSketchRect(
     width * 0.25,
     height * 0.19,
     width * 0.63,
@@ -46,7 +50,7 @@ function createInterfaceSegments() {
     roughnessSmall
   );
 
-  missionSegments = createSegmentRect(
+  missionSegments = createSketchRect(
     width * 0.28,
     height * 0.06,
     width * 0.30,
@@ -55,7 +59,7 @@ function createInterfaceSegments() {
     roughnessSmall
   );
 
-  bgmSegments = createSegmentRect(
+  bgmSegments = createSketchRect(
     width * 0.64,
     height * 0.075,
     width * 0.18,
@@ -63,6 +67,111 @@ function createInterfaceSegments() {
     width * 0.015,
     roughnessSmall
   );
+}
+
+function createPaletteComponents() {
+  paletteComponents = [];
+
+  let panelX = width * 0.035;
+  let panelY = height * 0.055;
+  let panelW = width * 0.16;
+
+  let componentX = panelX + panelW * 0.15;
+  let componentW = panelW * 0.7;
+
+  let currentY = panelY + height * 0.12;
+  let gap = height * 0.025;
+
+  let backgroundH = height * 0.06;
+  let imageW = componentW * 0.55;
+  let imageH = height * 0.14;
+  let searchH = height * 0.04;
+  let titleH = height * 0.035;
+  let textH = height * 0.06;
+  let cardW = componentW * 0.9;
+  let cardH = height * 0.25;
+
+  paletteComponents.push(
+    new Component(
+      componentX,
+      currentY,
+      componentW,
+      backgroundH,
+      "backgroundImage",
+      "background"
+    )
+  );
+
+  currentY += backgroundH + gap;
+
+  paletteComponents.push(
+    new Component(
+      componentX + panelW * 0.15,
+      currentY,
+      imageW,
+      imageH,
+      "image",
+      "image"
+    )
+  );
+
+  currentY += imageH + gap;
+
+  paletteComponents.push(
+    new Component(
+      componentX,
+      currentY,
+      componentW,
+      searchH,
+      "search",
+      "search"
+    )
+  );
+
+  currentY += searchH + gap;
+
+  paletteComponents.push(
+    new Component(
+      componentX,
+      currentY,
+      componentW,
+      titleH,
+      "title",
+      "title"
+    )
+  );
+
+  currentY += titleH + gap;
+
+  paletteComponents.push(
+    new Component(
+      componentX,
+      currentY,
+      componentW,
+      textH,
+      "text",
+      "text"
+    )
+  );
+
+  currentY += textH + gap;
+
+  paletteComponents.push(
+    new Component(
+      componentX + panelX * 0.15,
+      currentY,
+      cardW,
+      cardH,
+      "card",
+      "card"
+    )
+  );
+}
+
+function drawPaletteComponents() {
+  for (let component of paletteComponents) {
+    component.display();
+  }
 }
 
 function drawInterface() {
@@ -91,13 +200,13 @@ function drawInterface() {
   noStroke();
   fill(70);
   textAlign(LEFT, CENTER);
-  textSize(width * 0.025);
+  textSize(width * 0.02);
   text("Components", width * 0.045, height * 0.09);
 
   // Mission text
   textAlign(CENTER, CENTER);
-  textSize(width * 0.035);
-  text("(mission)", width * 0.43, height * 0.12);
+  textSize(width * 0.015);
+  text("Design a website for our 美术馆~", width * 0.43, height * 0.12);
 
   // little museum-guide figure
   stroke(70);
@@ -125,15 +234,14 @@ function drawInterface() {
   noFill();
   stroke(70);
   strokeWeight(3);
-  ellipse(width * 0.875, height * 0.10, width * 0.055, width * 0.055);
-
+  drawSketchCircle(width * 0.875, height * 0.10, width * 0.0275, 2, 10);
 
   // trash button
-  ellipse(width * 0.94, height * 0.10, width * 0.055, width * 0.055);
-
+  drawSketchCircle(width * 0.94, height * 0.10, width * 0.0275, 2, 20);
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   createInterfaceSegments();
+  createPaletteComponents();
 }

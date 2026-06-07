@@ -57,7 +57,7 @@ function createSegmentLine(
 
 
 
-function createSegmentRect(
+function createSketchRect(
   x,
   y,
   w,
@@ -112,7 +112,22 @@ function createSegmentRect(
   return result;
 }
 
+function drawSketchCircle(cx, cy, r, roughness) {
+  noFill();
+  beginShape();
 
+  for (let angle = 0; angle < TWO_PI; angle += 0.25) {
+    let offset = noise(angle * 2) * roughness * 2 - roughness;
+    let offsetR = r + offset;
+
+    let x = cx + cos(angle) * offsetR;
+    let y = cy + sin(angle) * offsetR;
+
+    vertex(x, y);
+  }
+
+  endShape(CLOSE);
+}
 
 function drawSegments(segments) {
 
@@ -133,31 +148,173 @@ function drawSegments(segments) {
 }
 
 
+class Component {
+  constructor(x, y, w, h, type, label) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
 
-function drawCardComponent(
-  x,
-  y,
-  w,
-  h,
-  segments,
-  label,
-  labelX,
-  labelY
-) {
+    this.type = type;
+    this.label = label;
 
-  drawSegments(segments);
+    this.segmentLength = width * 0.015;
+    this.roughness = 2;
 
-  noStroke();
-  fill(30);
+    this.segments = createSketchRect(
+      this.x,
+      this.y,
+      this.w,
+      this.h,
+      this.segmentLength,
+      this.roughness
+    );
+  }
 
-  textSize(width * 0.015);
+  display() {
 
-  textAlign(CENTER, CENTER);
+    if (this.type == "image") {
 
-  text(
-    label,
-    labelX,
-    labelY
-  );
+      drawSegments(this.segments);
 
+      noStroke();
+      fill(30);
+
+      textAlign(CENTER, CENTER);
+      textSize(width * 0.012);
+
+      text(
+        "image",
+        this.x + this.w / 2,
+        this.y + this.h / 2
+      );
+
+    }
+
+    else if (this.type == "backgroundImage") {
+
+      drawSegments(this.segments);
+
+      noStroke();
+      fill(30);
+
+      textAlign(CENTER, CENTER);
+      textSize(width * 0.012);
+
+      text(
+        "background image",
+        this.x + this.w / 2,
+        this.y + this.h / 2
+      );
+
+    }
+
+    else if (this.type == "search") {
+
+      drawSegments(this.segments);
+
+      stroke(30);
+      strokeWeight(2);
+
+      noFill();
+
+      ellipse(
+        this.x + this.h * 0.35,
+        this.y + this.h * 0.5,
+        this.h * 0.35
+      );
+
+      line(
+        this.x + this.h * 0.48,
+        this.y + this.h * 0.63,
+
+        this.x + this.h * 0.62,
+        this.y + this.h * 0.77
+      );
+
+    }
+
+    else if (this.type == "title") {
+
+      stroke(2);
+      fill(30);
+
+      textAlign(LEFT, CENTER);
+
+      textSize(this.h * 0.7);
+
+      text(
+        "TITLE",
+        this.x,
+        this.y + this.h / 2
+      );
+
+    }
+
+    else if (this.type == "text") {
+
+      noStroke();
+      fill(30);
+
+      textAlign(LEFT, TOP);
+
+      textSize(this.h * 0.3);
+
+      text(
+        'This text is only for testing\nthe function of this\ncomponent.',
+        this.x,
+        this.y,
+      );
+
+    }
+
+    else if (this.type == "card") {
+      drawSegments(this.segments);
+
+      // image placeholder inside card
+      let imgX = this.x + this.w * 0.1;
+      let imgY = this.y + this.h * 0.08;
+      let imgW = this.w * 0.6;
+      let imgH = this.h * 0.5;
+
+      noFill();
+      stroke(30);
+      strokeWeight(2);
+      rect(imgX, imgY, imgW, imgH);
+
+      // three-dot menu
+      noStroke();
+      fill(20);
+
+      let dotX = this.x + this.w * 0.88;
+
+      ellipse(
+        dotX,
+        this.y + this.h * 0.12,
+        this.w * 0.03
+      );
+
+      ellipse(
+        dotX + 1,
+        this.y + this.h * 0.16,
+        this.w * 0.03
+      );
+
+      ellipse(
+        dotX,
+        this.y + this.h * 0.20,
+        this.w * 0.03
+      );
+
+      stroke(30);
+      strokeWeight(2);
+
+      line(
+        this.x + this.w * 0.08,
+        this.y + this.h * 0.65,
+        this.x + this.w * 0.85,
+        this.y + this.h * 0.65
+      );
+    }
+  }
 }
