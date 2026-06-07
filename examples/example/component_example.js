@@ -5,6 +5,28 @@ let missionSegments;
 let bgmSegments;
 
 let paletteComponents = [];
+let placedComponents = [];
+let traces = [];
+
+let refreshCount = 0;
+
+let draggingComponent = null;
+
+let flyingComponentIndex = -1;
+let systemOverloaded = false;
+
+let workspaceX;
+let workspaceY;
+let workspaceW;
+let workspaceH;
+
+let refreshX;
+let refreshY;
+let refreshR;
+
+let trashX;
+let trashY;
+let trashR;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -16,12 +38,33 @@ function draw() {
   background(245);
 
   drawInterface();
+
+  drawTraces();
+
+  checkOverload();
+  drawPlacedComponents();
+
   drawPaletteComponents();
+
+  drawDraggingComponent();
 }
 
 function createInterfaceSegments() {
   let roughnessLarge = 0.8;
   let roughnessSmall = 1.2;
+
+  workspaceX = width * 0.25;
+  workspaceY = height * 0.19;
+  workspaceW = width * 0.63;
+  workspaceH = height * 0.75;
+
+  refreshX = width * 0.875;
+  refreshY = height * 0.10;
+  refreshR = width * 0.0275;
+
+  trashX = width * 0.94;
+  trashY = height * 0.10;
+  trashR = width * 0.0275;
 
   outerSegments = createSketchRect(
     width * 0.02,
@@ -42,10 +85,10 @@ function createInterfaceSegments() {
   );
 
   workspaceSegments = createSketchRect(
-    width * 0.25,
-    height * 0.19,
-    width * 0.63,
-    height * 0.75,
+    workspaceX,
+    workspaceY,
+    workspaceW,
+    workspaceH,
     width * 0.025,
     roughnessSmall
   );
@@ -174,20 +217,37 @@ function drawPaletteComponents() {
   }
 }
 
+function drawPlacedComponents() {
+  for (let component of placedComponents) {
+    component.display();
+  }
+}
+
+function drawDraggingComponent() {
+  if (draggingComponent != null) {
+    let targetX = mouseX - draggingComponent.w / 2;
+    let targetY = mouseY - draggingComponent.h / 2;
+
+    let dx = targetX - draggingComponent.x;
+    let dy = targetY - draggingComponent.y;
+
+    moveComponent(draggingComponent, dx, dy);
+
+    draggingComponent.display();
+  }
+}
+
 function drawInterface() {
-  // grey background area
   noStroke();
   fill(190);
   rect(width * 0.02, height * 0.03, width * 0.96, height * 0.95);
 
-  // white panel and workspace fills
   fill(250);
   rect(width * 0.035, height * 0.055, width * 0.16, height * 0.89);
 
   fill(255);
-  rect(width * 0.25, height * 0.19, width * 0.63, height * 0.75);
+  rect(workspaceX, workspaceY, workspaceW, workspaceH);
 
-  // draw sketch borders
   stroke(70);
   strokeWeight(3);
   drawSegments(outerSegments);
@@ -196,19 +256,16 @@ function drawInterface() {
   drawSegments(missionSegments);
   drawSegments(bgmSegments);
 
-  // Components text
   noStroke();
   fill(70);
   textAlign(LEFT, CENTER);
   textSize(width * 0.02);
   text("Components", width * 0.045, height * 0.09);
 
-  // Mission text
   textAlign(CENTER, CENTER);
   textSize(width * 0.015);
   text("Design a website for our 美术馆~", width * 0.43, height * 0.12);
 
-  // little museum-guide figure
   stroke(70);
   strokeWeight(3);
   noFill();
@@ -217,27 +274,236 @@ function drawInterface() {
   line(width * 0.25, height * 0.095, width * 0.265, height * 0.18);
   line(width * 0.235, height * 0.18, width * 0.265, height * 0.18);
 
-  // BGM selector text
   noStroke();
   fill(70);
   textAlign(LEFT, CENTER);
   textSize(width * 0.018);
   text("bgm", width * 0.655, height * 0.103);
 
-  // dropdown arrow
   stroke(70);
   strokeWeight(3);
   line(width * 0.80, height * 0.095, width * 0.805, height * 0.105);
   line(width * 0.81, height * 0.095, width * 0.805, height * 0.105);
 
-  // refresh button
   noFill();
   stroke(70);
   strokeWeight(3);
-  drawSketchCircle(width * 0.875, height * 0.10, width * 0.0275, 2, 10);
+  drawSketchCircle(refreshX, refreshY, refreshR, 2, 10);
 
-  // trash button
-  drawSketchCircle(width * 0.94, height * 0.10, width * 0.0275, 2, 20);
+  drawSketchCircle(trashX, trashY, trashR, 2, 20);
+}
+
+function mousePressed() {
+  if (isInsideCircle(mouseX, mouseY, refreshX, refreshY, refreshR)) {
+    fakeRefresh();
+    return;
+  }
+
+  if (isInsideCircle(mouseX, mouseY, trashX, trashY, trashR)) {
+    placedComponents = [];
+    systemOverloaded = false;
+    flyingComponentIndex = -1;
+    return;
+  }
+
+  for (let component of paletteComponents) {
+    if (isInsideComponent(mouseX, mouseY, component)) {
+      let size = getWorkspaceComponentSize(component.type);
+
+      draggingComponent = new Component(
+        mouseX - size.w / 2,
+        mouseY - size.h / 2,
+        size.w,
+        size.h,
+        component.type,
+        component.label
+      );
+
+      return;
+    }
+  }
+}
+
+function mouseReleased() {
+  if (draggingComponent != null) {
+    if (isInsideWorkspace(mouseX, mouseY)) {
+      placedComponents.push(draggingComponent);
+    }
+
+    draggingComponent = null;
+  }
+}
+
+function getWorkspaceComponentSize(type) {
+  if (type == "backgroundImage") {
+    return {
+      w: workspaceW * 0.55,
+      h: workspaceH * 0.18
+    };
+  } else if (type == "image") {
+    let imageSize = workspaceW * 0.11;
+
+    return {
+      w: imageSize,
+      h: imageSize
+    };
+  } else if (type == "search") {
+    return {
+      w: workspaceW * 0.35,
+      h: workspaceH * 0.07
+    };
+  } else if (type == "title") {
+    return {
+      w: workspaceW * 0.175,
+      h: workspaceH * 0.035
+    };
+  } else if (type == "text") {
+    return {
+      w: workspaceW * 0.175,
+      h: workspaceH * 0.06
+    };
+  } else if (type == "card") {
+    let cardW = workspaceW * 0.16;
+
+    return {
+      w: cardW,
+      h: cardW * 1.25
+    };
+  }
+
+  return {
+    w: workspaceW * 0.2,
+    h: workspaceH * 0.1
+  };
+}
+
+function checkOverload() {
+  if (placedComponents.length > 10 && !systemOverloaded) {
+    systemOverloaded = true;
+
+    flyingComponentIndex = Math.floor(random(placedComponents.length));
+
+    placedComponents[flyingComponentIndex].vx = random(-5, 5);
+    placedComponents[flyingComponentIndex].vy = random(-5, 5);
+  }
+
+  if (systemOverloaded && flyingComponentIndex >= 0) {
+    let component = placedComponents[flyingComponentIndex];
+
+    moveComponent(component, component.vx, component.vy);
+
+    if (
+      component.x < workspaceX ||
+      component.x + component.w > workspaceX + workspaceW
+    ) {
+      component.vx *= -1;
+    }
+
+    if (
+      component.y < workspaceY ||
+      component.y + component.h > workspaceY + workspaceH
+    ) {
+      component.vy *= -1;
+    }
+  }
+}
+
+function fakeRefresh() {
+  refreshCount++;
+
+  if (refreshCount >= 2) {
+    for (let component of placedComponents) {
+      traces.push(copyComponentAsTrace(component));
+    }
+  }
+
+  placedComponents = [];
+
+  systemOverloaded = false;
+  flyingComponentIndex = -1;
+}
+
+function copyComponentAsTrace(component) {
+  let copiedSegments = [];
+
+  for (let seg of component.segments) {
+    copiedSegments.push({
+      x1: seg.x1,
+      y1: seg.y1,
+      x2: seg.x2,
+      y2: seg.y2
+    });
+  }
+
+  return {
+    x: component.x,
+    y: component.y,
+    w: component.w,
+    h: component.h,
+    type: component.type,
+    label: component.label,
+    segments: copiedSegments
+  };
+}
+
+function drawTraces() {
+  for (let trace of traces) {
+    stroke(80, 80, 80, 45);
+    strokeWeight(3);
+    noFill();
+
+    for (let seg of trace.segments) {
+      line(seg.x1, seg.y1, seg.x2, seg.y2);
+    }
+
+    noStroke();
+    fill(80, 80, 80, 35);
+    textSize(width * 0.012);
+    textAlign(CENTER, CENTER);
+
+    text(
+      trace.type,
+      trace.x + trace.w / 2,
+      trace.y + trace.h / 2
+    );
+  }
+}
+
+function moveComponent(component, dx, dy) {
+  component.x += dx;
+  component.y += dy;
+
+  for (let seg of component.segments) {
+    seg.x1 += dx;
+    seg.y1 += dy;
+    seg.x2 += dx;
+    seg.y2 += dy;
+  }
+}
+
+function isInsideComponent(px, py, component) {
+  return (
+    px > component.x &&
+    px < component.x + component.w &&
+    py > component.y &&
+    py < component.y + component.h
+  );
+}
+
+function isInsideWorkspace(px, py) {
+  return (
+    px > workspaceX &&
+    px < workspaceX + workspaceW &&
+    py > workspaceY &&
+    py < workspaceY + workspaceH
+  );
+}
+
+function isInsideCircle(px, py, cx, cy, r) {
+  let dx = px - cx;
+  let dy = py - cy;
+
+  return dx * dx + dy * dy < r * r;
 }
 
 function windowResized() {
