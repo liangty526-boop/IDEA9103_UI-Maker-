@@ -24,6 +24,7 @@ function setup() {
 function draw() {
   background(250);
   updateTime();
+  updateStage2Glitches(); 
 
   for (let c of placedComponents) {
     if (timeState.glitchesEnabled && typeof glitchComponent === 'function') {
@@ -59,6 +60,12 @@ function updateTime() {
 
 function drawComponentClean(c) {
   push();
+
+  translate(c._shakeX || 0, c._shakeY || 0);         
+  if (c._blur && c._blur > 0.01) {                  
+    drawingContext.filter = 'blur(' + c._blur + 'px)';
+  }
+
   rectMode(CORNER);
   noStroke();
   fill(245);
@@ -71,18 +78,22 @@ function drawComponentClean(c) {
   textAlign(LEFT, CENTER);
   textSize(18);
   text(c.text, c.x + 16, c.y + c.h / 2);
+
+  drawingContext.filter = 'none'; 
   pop();
 }
 
 function drawDebugHUD() {
   push(); resetMatrix();
+  drawingContext.filter = 'none';
+
   noStroke(); fill(0, 180);
   rect(0, 0, 230, 72);
   fill(255); textAlign(LEFT, TOP); textSize(14);
   text('Stage: ' + timeState.currentStage, 12, 10);
   text('Time: ' + (timeState.elapsedMs / 1000).toFixed(1) + ' s', 12, 32);
   text('corruption: ' + timeState.corruption.toFixed(2), 12, 54);
-  text('Components: ' + placedComponents.length, 12, 52);
+  text('Components: ' + placedComponents.length, 12, 72);
   pop();
 }
 
