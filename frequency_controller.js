@@ -1,54 +1,32 @@
 
 const glitchChars = ['#', '@', '%', '&', '/', '\\', '*', '?', '!', '░', '▓', '█'];
 
-function glitchComponent(component) {
 
+function glitchComponent(component) {
+  // levels of effects
   // bass
   let bass = constrain(map(smoothBass, currentSettings.bassMin, currentSettings.bassMax, 0, currentSettings.bassRange), 0, currentSettings.bassRange);
   let dongcidaci = bass * bass * bass * bass;
   let bassShake = dongcidaci * 10 * corruption;
   let bass_x_offset = random(-bassShake, bassShake);
   let bass_y_offset = random(-bassShake, bassShake);
-
-  // shaking effect
-  let x = component.x + bass_x_offset;   
-  let y = component.y + bass_y_offset;
-
-
-  // testing component
-  push();
-  noFill();
-  stroke(90, 90, 110);
-  strokeWeight(8);
-  rect(x, y, component.w, component.h);
-  pop();
-
-
-  // treble (frame)
+  
+  // treble & mid
   let treble = constrain(map(smoothTreble, currentSettings.trebleMin, currentSettings.trebleMax, 0, currentSettings.trebleRange), 0, currentSettings.trebleRange);
-  let woxiale = treble * treble;
-
-  let treble_offset = woxiale * corruption;
-
-  push();
-  rectMode(CORNER);
-  blendMode(ADD); //effect point
-
-  // red (left)
-  noStroke();
-  fill(120, 0, 0);
-  rect(x - treble_offset, y, component.w, component.h);
-  // green (middle)
-  fill(0, 120, 0);
-  rect(x, y, component.w, component.h);
-  // blue (right)
-  fill(0, 0, 120);
-  rect(x + treble_offset, y, component.w, component.h);
-
-  pop();
-
-  // mid and treble (text)
   let mid = constrain(map(smoothMid, currentSettings.midMin, currentSettings.midMax, 0, currentSettings.midRange), 0, currentSettings.midRange);
+  
+  // type dividing
+  if (component.type === "title" || component.type === "text") {
+    // text component
+    glitchTextOnly(component, bass_x_offset, bass_y_offset, mid, treble);
+  } else {
+    // frame component
+    glitchFramedComponent(component, bass_x_offset, bass_y_offset, mid, treble);
+  }
+}
+
+function glitchTextOnly(){
+  // mid and treble (text)
   
   textAlign(LEFT, CENTER);
   textSize(20);
@@ -95,6 +73,59 @@ function glitchComponent(component) {
     charX += textWidth(displayChar);
   }
 
+}
+
+function glitchFramedComponent(){
+  // shaking effect
+  let x = component.x + bass_x_offset;   
+  let y = component.y + bass_y_offset;
+
+
+  // testing component
+  push();
+  noFill();
+  stroke(90, 90, 110);
+  strokeWeight(8);
+  rect(x, y, component.w, component.h);
+  pop();
+
+
+  // treble (frame)
+  let woxiale = treble * treble;
+
+  let treble_offset = woxiale * corruption;
+
+  push();
+  rectMode(CORNER);
+  blendMode(ADD); //effect point
+
+  // red (left)
+  noStroke();
+  fill(120, 0, 0);
+  rect(x - treble_offset, y, component.w, component.h);
+  // green (middle)
+  fill(0, 120, 0);
+  rect(x, y, component.w, component.h);
+  // blue (right)
+  fill(0, 0, 120);
+  rect(x + treble_offset, y, component.w, component.h);
+
+  pop();
+}
+
+/*
+function glitchComponent(component) {
+
+  // bass
+  let bass = constrain(map(smoothBass, currentSettings.bassMin, currentSettings.bassMax, 0, currentSettings.bassRange), 0, currentSettings.bassRange);
+  let dongcidaci = bass * bass * bass * bass;
+  let bassShake = dongcidaci * 10 * corruption;
+  let bass_x_offset = random(-bassShake, bassShake);
+  let bass_y_offset = random(-bassShake, bassShake);
+*/
+  
+
+  
   /*
     for (let letter of component.text) {
     let displayText = "";
@@ -121,6 +152,3 @@ function glitchComponent(component) {
 
   
   */
-
-  //现在我感觉需要做一个list，存放不同歌曲不一样的参数，我觉得具体会修改的参数一个是
-}
