@@ -4,7 +4,7 @@ const glitchChars = ['#', '@', '%', '&', '/', '\\', '*', '?', '!', '░', '▓',
 function glitchComponent(component) {
 
   // bass
-  let bass = constrain(map(smoothBass, 125, 255, 0, 1), 0, 1);
+  let bass = constrain(map(smoothBass, currentSettings.bassMin, currentSettings.bassMax, 0, currentSettings.bassRange), 0, currentSettings.bassRange);
   let dongcidaci = bass * bass * bass * bass;
   let bassShake = dongcidaci * 10 * corruption;
   let bass_x_offset = random(-bassShake, bassShake);
@@ -25,7 +25,7 @@ function glitchComponent(component) {
 
 
   // treble (frame)
-  let treble = constrain(map(smoothTreble, 0, 255, 0, 6), 0, 6);
+  let treble = constrain(map(smoothTreble, currentSettings.trebleMin, currentSettings.trebleMax, 0, currentSettings.trebleRange), 0, currentSettings.trebleRange);
   let woxiale = treble * treble;
 
   let treble_offset = woxiale * corruption;
@@ -48,9 +48,8 @@ function glitchComponent(component) {
   pop();
 
   // mid and treble (text)
-  let mid = constrain(map(smoothMid, 75, 255, 0, 0.4), 0, 0.4);
-
-  // push();
+  let mid = constrain(map(smoothMid, currentSettings.midMin, currentSettings.midMax, 0, currentSettings.midRange), 0, currentSettings.midRange);
+  
   textAlign(LEFT, CENTER);
   textSize(20);
   noStroke();

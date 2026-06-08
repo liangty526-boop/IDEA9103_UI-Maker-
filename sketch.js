@@ -8,19 +8,19 @@ let testComp = { x: 250, y: 200, w: 600, h: 80, text: "I AM A VERY LONG TESTING 
 let playButton;
 let currentSongIndex = 0;
 let songSettings = [
-  { bassMin: 125, midMin: 75, trebleMin: 0, bassMax: 255, midMax: 255, trebleMax: 255, bassRange: 1, midRange: 0.4, trebleRange: 6 },
-  { bassMin: 125, midMin: 75, trebleMin: 0, bassMax: 255, midMax: 255, trebleMax: 255, bassRange: 1, midRange: 0.4, trebleRange: 6 },
-  { bassMin: 125, midMin: 75, trebleMin: 0, bassMax: 255, midMax: 255, trebleMax: 255, bassRange: 1, midRange: 0.4, trebleRange: 6 },
-  { bassMin: 125, midMin: 75, trebleMin: 0, bassMax: 255, midMax: 255, trebleMax: 255, bassRange: 1, midRange: 0.4, trebleRange: 6 },
+  { bassMin: 200, midMin: 30, trebleMin: 0, bassMax: 255, midMax: 80, trebleMax: 255, bassRange: 1, midRange: 0.4, trebleRange: 6 , smoothB: 0.8, smoothM: 0.6, smoothT: 0.2},
+  { bassMin: 150, midMin: 110, trebleMin: 25, bassMax: 255, midMax: 170, trebleMax: 60, bassRange: 1, midRange: 0.4, trebleRange: 6 , smoothB: 0.8, smoothM: 0.6, smoothT: 1},
+  { bassMin: 150, midMin: 75, trebleMin: 50, bassMax: 240, midMax: 170, trebleMax: 150, bassRange: 1, midRange: 0.4, trebleRange: 6 , smoothB: 0.8, smoothM: 0.6, smoothT: 1},
+  { bassMin: 210, midMin: 120, trebleMin: 100, bassMax: 255, midMax: 230, trebleMax: 160, bassRange: 1, midRange: 0.4, trebleRange: 6 , smoothB: 0.8, smoothM: 0.6, smoothT: 1},
 ];
 
 let currentSettings = songSettings[0];
 
 function preload() {
-  song[0] = loadSound("Assets/songs/sample4.mp3");
-  song[1] = loadSound("Assets/songs/sample8.mp3");
-  song[2] = loadSound("Assets/songs/sample10.mp3");
-  song[3] = loadSound("Assets/songs/bonus1.mp3");
+  song[0] = loadSound("Assets/songs/Brian Eno - Music for Airports.mp3");
+  song[1] = loadSound("Assets/songs/The Caretaker - We don't have many days.mp3");
+  song[2] = loadSound("Assets/songs/塞壬唱片-MSR,Elvin Shen - Visage.mp3");
+  song[3] = loadSound("Assets/songs/Victor Borba - Bury the Light.mp3");
 }
 
 function setup() {
@@ -36,25 +36,29 @@ function setup() {
 
 
   // testing buttons
-  let btn1 = createButton('歌1');
+  let btn1 = createButton('song 1');
   btn1.position(80, 20);
   btn1.mousePressed(() => switchBGM(0));
   
-  let btn2 = createButton('歌2');
+  let btn2 = createButton('song 2');
   btn2.position(130, 20);
   btn2.mousePressed(() => switchBGM(1));
   
-  let btn3 = createButton('歌3');
+  let btn3 = createButton('song 3');
   btn3.position(180, 20);
   btn3.mousePressed(() => switchBGM(2));
+
+  let btn4 = createButton('bonus');
+  btn4.position(230, 20);
+  btn4.mousePressed(() => switchBGM(3));
 }
 
 function bgmPlay() {
-  if (!song[0].isPlaying()) {
-    song[0].loop();
+  if (!song[currentSongIndex].isPlaying()) {
+    song[currentSongIndex].loop();
     playButton.html('Pause');
   } else {
-    song[0].pause();
+    song[currentSongIndex].pause();
     playButton.html('Play');
   }
 }
@@ -67,9 +71,9 @@ function draw() {
   let mid = fft.getEnergy("mid");
   let treble = fft.getEnergy("treble");
 
-  smoothBass = lerp(smoothBass, bass, 0.8);
-  smoothMid = lerp(smoothMid, mid, 0.6);
-  smoothTreble = lerp(smoothTreble, treble, 0.2);
+  smoothBass = lerp(smoothBass, bass, currentSettings.smoothB);
+  smoothMid = lerp(smoothMid, mid, currentSettings.smoothM);
+  smoothTreble = lerp(smoothTreble, treble, currentSettings.smoothT);
 
   glitchComponent(testComp);
 
@@ -99,6 +103,7 @@ function switchBGM(index) {
   currentSongIndex = index;            // change index
   fft.setInput(song[index]);           // analysize new song
   song[index].loop();                  // play new song
+  currentSettings = songSettings[index];   // change new song settings
   
   playButton.html('Pause');
 }
