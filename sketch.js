@@ -96,7 +96,7 @@ let fft;
 let corruption = 1;
 let smoothBass = 0, smoothMid = 0, smoothTreble = 0;
 
-let playButton;
+//let playButton;
 let currentSongIndex = 0;
 let songSettings = [    // each song has its own settings for best visual experience
   { bassMin: 150, midMin: 75, trebleMin: 50, bassMax: 240, midMax: 170, trebleMax: 150, bassRange: 1, midRange: 0.4, trebleRange: 6 , smoothB: 0.8, smoothM: 0.6, smoothT: 1},
@@ -161,6 +161,7 @@ function setup() {
   createInterfaceSegments();
   createPaletteComponents();
 
+  /*
   // testing button
   playButton = createButton('Play');
   playButton.position(20, 20);
@@ -183,16 +184,17 @@ function setup() {
   let btn4 = createButton('bonus');
   btn4.position(230, 20);
   btn4.mousePressed(() => switchBGM(3));
+  */
 }
 
 // loop function
 function bgmPlay() {
   if (!song[currentSongIndex].isPlaying()) {
     song[currentSongIndex].loop();
-    playButton.html('Pause');
+    //playButton.html('Pause');
   } else {
     song[currentSongIndex].pause();
-    playButton.html('Play');
+    //playButton.html('Play');
   }
 }
 
@@ -245,8 +247,9 @@ function draw() {
   drawCorruption();
   }
 
-  drawDebugHUD();
+  //drawDebugHUD();
 
+  /*
   // testing text for audio part
   fill(120);
   textAlign(LEFT, TOP);
@@ -259,6 +262,7 @@ function draw() {
     20, 60
   );
   textAlign(CENTER, CENTER);
+  */
 }
 
 function windowResized() {
@@ -924,6 +928,8 @@ function updateTime() {
 
   corruption = timeState.corruption;
 }
+
+/*
 //for testing - get testing data
 function drawDebugHUD() {
   push(); 
@@ -943,6 +949,7 @@ function drawDebugHUD() {
   text('Components: ' + placedComponents.length, rectX + 12, rectY + 60);
   pop();
 }
+
 //for testing - change stage
 function keyPressed() {
   if (!galleryStarted) {
@@ -956,6 +963,7 @@ function keyPressed() {
   if (key === '3') virtualElapsedMs = STAGE_DURATION_MS * 2;
   if (key === '4') virtualElapsedMs = STAGE_DURATION_MS * 3;
 }
+  */
 
 function startBGMOnFirstInteraction() {
   if (bgmStarted) return;
