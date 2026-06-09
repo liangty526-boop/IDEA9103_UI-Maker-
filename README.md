@@ -90,3 +90,9 @@ Visually, the project is unified through the contrast between clean UI structure
 
 >Our draft for the system
 <img src="assets/readme/draft.jpg" width="500">
+
+# AI acknowledgement:
+
+We used ChatGPT and Claude as supportive tools during the development of this project. Their assistance was limited to improving code clarity, suggesting fixes for merge‑related errors, providing guidance on GitHub workflows, and helping us shorten redundant sections of code into cleaner and more readable implementations. 
+
+All core ideas, system design decisions, and the essential logic of the project were fully conceived and implemented by us.
