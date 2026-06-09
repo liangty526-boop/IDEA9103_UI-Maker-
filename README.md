@@ -122,11 +122,15 @@ This mechanic transforms the project from a controllable design environment into
 
 ## Perlin Noise and Randomness Mechanic
 
-The Perlin noise and randomness mechanic controls the system’s “organic growth” behaviour. Compared to rigid or mechanical movement, Perlin noise creates smoother and more natural motion. It will be used to control the movement of line structures, the spread of dots, background distortion, and the drifting motion of interface elements.
+The Perlin noise mechanic drives the organic, unpredictable behaviour of all corruption visuals. Rather than using uniform or purely random motion, Perlin noise generates smoothly flowing values that guide the direction and density of both dots and vines across the canvas.
 
-Randomness also makes the system’s growth unpredictable. Components may duplicate in different directions, some areas may become more heavily “infected” than others, and line structures may continue growing along changing paths.
+The dot diffusion phase samples noise at each spawn point to vary the radius of individual circles, creating uneven, biologically-textured clusters along component borders rather than clean geometric rings.
 
-The goal of this mechanic is to gradually transform the interface from a rational digital system into something that feels more like a living organism.
+During the vine growth phase, each active tip continuously queries a three-dimensional noise field using its current position and a unique seed offset. This causes headings to drift gradually over time, producing curling, root-like paths that feel driven by an internal logic rather than scripted movement.
+
+Occasional sharp directional breaks are layered on top of the noise-guided movement, introducing unpredictable branching that prevents paths from becoming too smooth or legible.
+
+This combination of structured noise and raw randomness is central to the project's theme: corruption that advances through patterns which feel almost intentional — coherent enough to seem alive, yet impossible for the user to predict or counteract.
 
 ---
 
