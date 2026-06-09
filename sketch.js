@@ -665,6 +665,7 @@ function mousePressed() {
     return;
   }
 
+  //start dragging a component when the user clicks it
   for (let component of paletteComponents) {
     if (isInsideComponent(mouseX, mouseY, component)) {
       let size = getWorkspaceComponentSize(component.type);
@@ -698,6 +699,7 @@ function mousePressed() {
 
 
 function mouseReleased() {
+//Place the component into the workspace when the mouse is released
   if (draggingComponent != null) {
     if (isInsideWorkspace(mouseX, mouseY)) {
       placedComponents.push(draggingComponent);
@@ -782,8 +784,7 @@ function getWorkspaceComponentSize(type) {
   };
 }
 
-
-
+//create refresh count for change the effect of refresh
 function fakeRefresh() {
   refreshCount++;
 
@@ -804,7 +805,7 @@ function fakeRefresh() {
 }
 
 
-
+//create copies of placed components for the ghost trace effect
 function copyComponentAsTrace(component) {
   let copiedSegments = [];
 
@@ -840,8 +841,6 @@ function moveComponent(component, dx, dy) {
   }
 }
 
-
-
 function isInsideComponent(px, py, component) {
   return (
     px > component.x &&
@@ -852,7 +851,6 @@ function isInsideComponent(px, py, component) {
 }
 
 
-
 function isInsideWorkspace(px, py) {
   return (
     px > workspaceX &&
@@ -861,7 +859,6 @@ function isInsideWorkspace(px, py) {
     py < workspaceY + workspaceH
   );
 }
-
 
 
 function isInsideCircle(px, py, cx, cy, r) {
