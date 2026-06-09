@@ -112,11 +112,7 @@ The audio mechanic use the treble, mid, and bass frequencies of the audio to con
 
 ## Time-based Mechanic
 
-The time-based mechanic controls the system’s progression through different stages over time. At the beginning, the interface appears clean, organised, and easy to control. However, as time passes, the system gradually enters new states.
-
-In the early stage, the interface behaves normally. Later, small distortions and layout shifts begin to appear. Eventually, spreading dots and plant-like structures start covering the workspace. The final stage becomes “irreversible,” where deleted components leave behind traces, ghost marks, or contaminated areas even after refreshing or resetting the interface.
-
-This mechanic transforms the project from a controllable design environment into a system that appears to develop autonomous behaviour.
+The time-based mechanic runs a hidden clock that drives the system through escalating stages, from a clean, controllable tool into one that no longer obeys the user. The clock speeds up as more components are placed — so the harder the user builds, the faster it falls apart. It also sets the shared **corruption** value that every other mechanic reads to decide how strongly to react.
 
 ---
 
@@ -183,7 +179,7 @@ Use `loadSound()`, `analyse()`, `getEnergy()`: By analysing and seperating the l
 Build an `array` for glitch chars. When outputting the characters in each text one by one, the audio-driven `glitchlevel` determines whether it becomes a glitch, and the `redlevel` determines whether it turns red.   
 
 
-# Part 3: AI acknowledgement:
+# Part 4: AI acknowledgement
 
 We used ChatGPT and Claude as supportive tools during the development of this project. Their assistance was limited to improving code clarity, suggesting fixes for merge‑related errors, providing guidance on GitHub workflows, and helping us shorten redundant sections of code into cleaner and more readable implementations. 
 
