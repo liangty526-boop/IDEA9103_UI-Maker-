@@ -5,7 +5,7 @@ let timeState = {
   elapsedMs: 0,          
   glitchesEnabled: false
 };
-
+//duration of the effect（time-base）
 const STAGE_DURATION_MS = 60000; 
 const STAGE_FLOOR_MS    = 35000; 
 const MAX_SPEED = STAGE_DURATION_MS / STAGE_FLOOR_MS; 
@@ -225,6 +225,11 @@ function draw() {
     pop();
   }
   
+  // Draw the independent corruption layer
+  if (typeof drawCorruption === 'function') {
+  drawCorruption();
+  }
+
   drawDebugHUD();
 
   // testing text for audio part
@@ -552,17 +557,6 @@ function drawTraces() {
     for (let seg of trace.segments) {
       line(seg.x1, seg.y1, seg.x2, seg.y2);
     }
-
-    noStroke();
-    fill(80, 80, 80, 35);
-    textSize(width * 0.012);
-    textAlign(CENTER, CENTER);
-
-    text(
-      trace.type,
-      trace.x + trace.w / 2,
-      trace.y + trace.h / 2
-    );
   }
 }
 
@@ -726,6 +720,7 @@ function getWorkspaceComponentSize(type) {
 }
 
 
+
 function fakeRefresh() {
   refreshCount++;
 
@@ -733,6 +728,10 @@ function fakeRefresh() {
     for (let component of placedComponents) {
       traces.push(copyComponentAsTrace(component));
     }
+  }
+
+  if (typeof fadeCorruptionLayer === 'function') {
+    fadeCorruptionLayer();
   }
 
   placedComponents = [];
@@ -845,7 +844,7 @@ function computeAllShakes() {
     comp._shakeY = (comp._shakeY || 0) + random(-bassShake, bassShake);
   }
 }
-
+//accelerate
 function updateTime() {
   let extra = max(0, placedComponents.length - COMPONENT_THRESHOLD);
   let speed = constrain(1 + extra * SPEED_PER_COMPONENT, 1, MAX_SPEED);
@@ -866,25 +865,26 @@ function updateTime() {
 
   corruption = timeState.corruption;
 }
-
+//for testing - get testing data
 function drawDebugHUD() {
   push(); 
   resetMatrix();
   drawingContext.filter = 'none';
-
+  let rectX = 0;
+  let rectY = height - 86;
   noStroke(); 
-  fill(0, 180);
-  rect(0, 0, 230, 72);
-  fill(255); 
+  fill(255, 180);
+  rect(rectX, rectY, 160, 96);
+  fill(0); 
   textAlign(LEFT, TOP); 
   textSize(14);
-  text('Stage: ' + timeState.currentStage, 12, 10);
-  text('Time: ' + (timeState.elapsedMs / 1000).toFixed(1) + ' s', 12, 32);
-  text('corruption: ' + timeState.corruption.toFixed(2), 12, 54);
-  text('Components: ' + placedComponents.length, 12, 72);
+  text('Stage: ' + timeState.currentStage, rectX + 12, rectY + 12);
+  text('Time: ' + (timeState.elapsedMs / 1000).toFixed(1) + ' s', rectX + 12, rectY + 28);
+  text('Corruption: ' + timeState.corruption.toFixed(2), rectX + 12, rectY + 44);
+  text('Components: ' + placedComponents.length, rectX + 12, rectY + 60);
   pop();
 }
-
+//for testing - change stage
 function keyPressed() {
   if (!galleryStarted) {
     galleryStarted = true;
